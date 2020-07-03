@@ -75,6 +75,7 @@
             </TabItem>
             <TabItem Style="{StaticResource Menu}"  Header="通常出荷"></TabItem>
             <TabItem Style="{StaticResource Menu}" Header="トラブル出荷"></TabItem>
+            
             <TabItem Style="{StaticResource Menu}" IsEnabled="False" Height="20"></TabItem>
             <TabItem Style="{StaticResource Menu}" Header="入庫"></TabItem>
             <TabItem Style="{StaticResource Menu}" IsEnabled="False" Height="20" VerticalAlignment="Bottom"></TabItem>
