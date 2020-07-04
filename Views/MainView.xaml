@@ -7,21 +7,25 @@
         mc:Ignorable="d"
         Title="StockMain" Height="450" Width="800">
     <Window.Resources>
-        <Style x:Key="Menu" TargetType="TabItem">
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Yu Gothic" />
+        </Style>
+        
+        
+        <!--#region メニューのテンプレート（root）-->
+        <Style x:Key="Menu" TargetType="TabItem">            
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TabItem">
-                        <Border Name="Border" CornerRadius="0" Margin="0" Padding="8,3,0,3" BorderThickness="0" Background="Transparent" Width="160">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="5"/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Name="TextBlock" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="0" FontSize="18" FontFamily="Yu Gothic" Foreground="white" Grid.Column="1" FontWeight="Bold">
+                        
+                        <!--要素の構成-->
+                        <Border Name="Border" CornerRadius="0" Margin="0" Padding="10,3,0,3" BorderThickness="0" Background="Transparent" Width="180">
+                            <TextBlock Name="TextBlock" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0"  Foreground="white" Grid.Column="1" FontWeight="Bold">       
                                     <ContentPresenter ContentSource="Header"/>
-                                </TextBlock>
-                            </Grid>
+                            </TextBlock>
                         </Border>
+                        
+                        <!--トリガー-->
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="Border" Property="Background" Value="#555"/>
@@ -42,10 +46,33 @@
                                 <Setter TargetName="Border" Property="Opacity" Value="1.0"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
+                        
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>            
         </Style>
+        <!--#endregion メニューのテンプレート（root）-->
+        
+        <!--メニューのうち、題名と空白-->
+        <Style x:Key="MenuCategory" TargetType="TabItem" BasedOn="{StaticResource Menu}">
+            <Setter Property="FontSize" Value="10">             </Setter>
+            <Setter Property="Height" Value="20"></Setter>
+            <Setter Property="IsEnabled" Value="False"></Setter>
+        </Style>
+        
+        <!--メニューのうち、ボタン機能のあるもの-->
+        <Style x:Key="MenuButton" TargetType="TabItem" BasedOn="{StaticResource Menu}">
+            <Setter Property="FontSize" Value="18"></Setter>
+            <Setter Property="Height" Value="30"></Setter>
+        </Style>
+
+        <!--メニューのうち、空白-->
+        <Style x:Key="MenuNothing" TargetType="TabItem" BasedOn="{StaticResource Menu}">
+            <Setter Property="Height" Value="10"></Setter>
+            <Setter Property="IsEnabled" Value="False"></Setter>
+        </Style>
+
+
 
         <Style TargetType="Button">
             <Setter Property="Margin" Value="4"/>
@@ -54,32 +81,64 @@
             <Setter Property="Height" Value="40"/>
         </Style>
 
+        <!--画面ヘッダ-->
+        <Style x:Key="WinHeader" TargetType="TextBlock">            
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Bottom"/>
+        </Style>
+
     </Window.Resources>
 
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="161"/>
-            <ColumnDefinition Width="196*" />
-            <ColumnDefinition Width="443*"/>
+            <ColumnDefinition Width="180"/>
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
         <Border Background="#333" BorderThickness="0,0,1,0" BorderBrush="#e8e8e8"/>
-        <TabControl TabStripPlacement="Left" BorderThickness="0" Grid.ColumnSpan="3">
-            <TabItem Style="{StaticResource Menu}" IsEnabled="False" Height="5"></TabItem>
+        <TabControl TabStripPlacement="Left" BorderThickness="0" Grid.ColumnSpan="2">
+
+            <TabItem Style="{StaticResource MenuNothing}" Header="karikarikari"  ></TabItem>
+            <TabItem Style="{StaticResource MenuCategory}"  Header="在庫確認"  ></TabItem>
+            <TabItem Style="{StaticResource MenuButton}"  IsSelected="True" Header="現在の在庫数">
+                <DockPanel>
+
+                    <Border Height="40" DockPanel.Dock="Top">
+                        <TextBlock Style="{StaticResource WinHeader}"  Text="現在の在庫数"/>                        
+                    </Border>
+                    <Border DockPanel.Dock="Top">
+                        <TextBlock   Text="速販からの出庫データCSVを指定してください"/>
+                        
+                    </Border>
+                    <Grid>
+                        
+                    </Grid>
+                    
 
 
-            <TabItem Style="{StaticResource Menu}" IsSelected="True" Header="在庫を確認する">
-                <Button Content="1111" ></Button>
+
+
+                    <Button Content="1111" ></Button>
+                </DockPanel>
+
                 
+
             </TabItem>
-            <TabItem Style="{StaticResource Menu}"  Header="通常出荷"></TabItem>
-            <TabItem Style="{StaticResource Menu}" Header="トラブル出荷"></TabItem>
-            
-            <TabItem Style="{StaticResource Menu}" IsEnabled="False" Height="20"></TabItem>
-            <TabItem Style="{StaticResource Menu}" Header="入庫"></TabItem>
-            <TabItem Style="{StaticResource Menu}" IsEnabled="False" Height="20" VerticalAlignment="Bottom"></TabItem>
-            <TabItem Style="{StaticResource Menu}" Header="設定"></TabItem>
+            <TabItem Style="{StaticResource MenuButton}"  IsSelected="True" Header="入出庫履歴"/>
+            <TabItem Style="{StaticResource MenuNothing}" IsEnabled="False" ></TabItem>
+
+            <TabItem Style="{StaticResource MenuCategory}"  Header="出庫登録"  ></TabItem>
+            <TabItem Style="{StaticResource MenuButton}"   Header="出荷データ取込"></TabItem>
+            <TabItem Style="{StaticResource MenuButton}"   Header="個別に登録する"></TabItem>
+
+            <TabItem Style="{StaticResource MenuNothing}" IsEnabled="False" ></TabItem>
+            <TabItem Style="{StaticResource MenuCategory}"  Header="入庫登録" ></TabItem>
+            <TabItem Style="{StaticResource MenuButton}"  Header="個別に登録する"></TabItem>
+
+            <TabItem Style="{StaticResource MenuNothing}" IsEnabled="False"  ></TabItem>
+            <TabItem Style="{StaticResource MenuButton}" Header="設定"></TabItem>
         </TabControl>
 
     </Grid>
