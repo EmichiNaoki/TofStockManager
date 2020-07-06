@@ -6,15 +6,112 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using System.Security.Cryptography.X509Certificates;
     using System.Windows.Documents;
     using Tofree.StockManager.Models;
 
+    using Microsoft.Extensions.Configuration;
 
     ///<summary
     ///MainViewウインドウに対するデータコンテキストを表します
     ///</summary>
     internal class MainViewModel : NotificationObject
     {
+
+        public MainViewModel()
+        {
+
+            for (int i = 0; i < 100; i++)
+            {
+                var product = new Product() 
+                {
+                    ProductNo = "sam-ple-" + i,
+                    ProductName = "これはサンプルです" + i,
+                    StockQTY = i*10,
+                    ModDate = DateTime.Today.ToString("yyyy/MM/dd"),
+                    ModTime = DateTime.Now.ToString("HH:mm:ss"),
+                };
+
+                ProductsList.Add(product);
+            }
+
+
+
+
+
+            DBManager dBManager = new DBManager
+            {
+
+            }
+
+
+
+
+        }
+
+
+        public class Program
+        {
+            public static IConfigurationRoot configuration;
+            public static void Main(string[] args)
+            {
+
+                configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile(@"appsettings.json", false).Build();
+                BuildWebHost(args).Run();
+            }
+            public static IWebHost BuildWebHost(string[] args) =>
+                WebHost.CreateDefaultBuilder(args)
+                    .UseStartup<Startup>()
+                    .Build();
+        }
+
+
+
+
+
+
+        public ObservableCollection<Product> _productsList = new ObservableCollection<Product>();
+        ///<summary
+        ///在庫情報のコレクションを取得します。
+        ///</summary>
+        public ObservableCollection<Product> ProductsList
+
+        {
+            get { return this._productsList; }
+            private set { SetProperty(ref this._productsList, value); }
+        }
+
+        
+        private DelegateCommand _addProductsListCommand;
+        ///<summary>
+        ///追加コマンドを取得します。
+        /// </summary>
+        public DelegateCommand AddProductsListCommand
+        {
+            get
+            {
+                return this._addProductsListCommand ?? (this._addProductsListCommand = new DelegateCommand(
+                    _ =>
+                    {
+                        this._count++;
+                        var product = new Product()
+                        {
+                            ProductNo = "sam-ple-" + this._count,
+                            ProductName = "これはサンプルです" + this._count,
+                            StockQTY = _count * 10,
+                            ModDate = DateTime.Today.ToString("yyyy/MM/dd"),
+                            ModTime = DateTime.Now.ToString("HH:mm:ss")
+                        };
+                        this.ProductsList.Add(product);
+                        
+                        System.Diagnostics.Debug.WriteLine(product.ProductName + "を追加しました。");
+                    }));
+            }
+        }
+
+
+
+
 
 
 

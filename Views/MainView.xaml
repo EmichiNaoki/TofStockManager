@@ -103,27 +103,68 @@
             <TabItem Style="{StaticResource MenuNothing}" Header="karikarikari"  ></TabItem>
             <TabItem Style="{StaticResource MenuCategory}"  Header="在庫確認"  ></TabItem>
             <TabItem Style="{StaticResource MenuButton}"  IsSelected="True" Header="現在の在庫数">
-                <DockPanel>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
 
-                    <Border Height="40" DockPanel.Dock="Top">
-                        <TextBlock Style="{StaticResource WinHeader}"  Text="現在の在庫数"/>                        
-                    </Border>
-                    <Border DockPanel.Dock="Top">
-                        <TextBlock   Text="速販からの出庫データCSVを指定してください"/>
-                        
-                    </Border>
-                    <Grid>
-                        
-                    </Grid>
+                    <Button Grid.Row="1" Content="add" Command="{Binding AddProductsListCommand}"/>
+
+
+                    <ItemsControl Grid.Row="2" ItemsSource="{Binding ProductsList}">
+                        <ItemsControl.Template>
+                            <ControlTemplate>
+                                <ScrollViewer>
+                                    <ItemsPresenter/>
+                                </ScrollViewer>
+                            </ControlTemplate>
+                        </ItemsControl.Template>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    
+                                
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding ProductNo}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding ProductName}"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding StockQTY}"/>
+                                    <TextBlock Grid.Column="3" Text="{Binding ModDate}"/>
+                                    <TextBlock Grid.Column="4" Text="{Binding ModTime}"/>
+                                    
+                                </Grid>
+                                </StackPanel>
+
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
                     
-
-
-
-
-                    <Button Content="1111" ></Button>
-                </DockPanel>
-
+                </Grid>
                 
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             </TabItem>
             <TabItem Style="{StaticResource MenuButton}"  IsSelected="True" Header="入出庫履歴"/>

@@ -1,0 +1,26 @@
+{
+  "exclude": [
+    "**/bin",
+    "**/bower_components",
+    "**/jspm_packages",
+    "**/node_modules",
+    "**/obj",
+    "**/platforms"
+  ],
+
+
+
+  
+    "Logging": {
+      "LogLevel": {
+        "Default": "Information",
+        "Microsoft": "Warning",
+        "Microsoft.Hosting.Lifetime": "Information"
+      }
+    },
+
+  "ConnectionStrings": {
+    "TOFDEV": "Data Source=192.168.2.126;Initial Catalog=TOFDIV;User ID=Developer;Password=Toufree1!;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
+  }
+  
+}
