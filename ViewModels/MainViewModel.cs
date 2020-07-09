@@ -2,6 +2,7 @@
 {
 
     using System;
+    using System.IO;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
@@ -11,6 +12,11 @@
     using Tofree.StockManager.Models;
 
     using Microsoft.Extensions.Configuration;
+    using Microsoft.Data.SqlClient;
+    using System.Diagnostics;
+    using Microsoft.VisualBasic.CompilerServices;
+
+    using Microsoft.EntityFrameworkCore;
 
     ///<summary
     ///MainViewウインドウに対するデータコンテキストを表します
@@ -21,26 +27,97 @@
         public MainViewModel()
         {
 
-            for (int i = 0; i < 100; i++)
+
+            DBManager dBManager = new DBManager();
+            var sqlstr = @"select * from TEST.T_STOCK;";
+            try
             {
-                var product = new Product() 
+                SqlDataReader dr = dBManager.ExecuteQuery(sqlstr);
+
+                if (dr.HasRows)
                 {
-                    ProductNo = "sam-ple-" + i,
-                    ProductName = "これはサンプルです" + i,
-                    StockQTY = i*10,
-                    ModDate = DateTime.Today.ToString("yyyy/MM/dd"),
-                    ModTime = DateTime.Now.ToString("HH:mm:ss"),
-                };
+                    while (dr.Read())
+                    {
+                        var product = new Product()
+                        {
+                            ProductNo = dr["CODE"].ToString(),
+                            ProductName = dr["Name"].ToString(),
+                            StockQTY = (int)dr["QTY"],
+                            ModDate = DateTime.Today.ToString("yyyy/MM/dd"),
+                            ModTime = DateTime.Now.ToString("HH:mm:ss"),
+                        };
 
-                ProductsList.Add(product);
+                        ProductsList.Add(product);
+
+                    }
+                }
+
+
+                dr.Close();
+                
+                
+
+
+
+            }
+            catch(Exception exc)
+            {
+                Debug.WriteLine(exc.Message);
+            }
+            finally
+            {
+
+                dBManager.Close();
             }
 
 
 
 
 
-            DBManager dBManager = new DBManager
+            var db = new AppDbContext();
+            var http = new System.Net.Http.HttpClient();
+
+            //フィードを適当なサイトから取得
+            foreach (var targetUrl in
+                new[] {
+                    "http://www3.asahi.com/rss/index.rdf",
+                    "http://rss.rssad.jp/rss/codezine/new/20/index.xml",
+                })
+
             {
+                //フィードxmlをDL & Parse
+                //xmlは名前空間で面倒が生じないよう名前空間情報を除染
+                var rssTxt = http.GetStringAsync(targetUrl).Result;
+                var rss = System.Xml.Linq.XElement.Parse(rssTxt);
+                foreach (var item in rss.Descendants())
+                    item.Name = item.Name.LocalName;
+
+
+                //フィードの記事をModelオブジェクトへ移し替える
+                var articles = rss
+                    .Descendants("item")
+                    .Select(item =>
+                        new Article()
+                        {
+                            Title = item.Element("title").Value,
+                            LinkUrl = item.Element("link").Value,
+                            Description = item.Element("description").Value,
+                            ChannelTitle = rss.Element("channel").Element("title").Value,
+                        });
+
+                //DBに未追加の記事をDBへ保存する
+                foreach (var item in articles)
+                {
+                    if (db.Article.Any(_ => _.LinkUrl == item.LinkUrl))
+                        continue;
+
+                    Console.WriteLine(item.Title);
+                    db.Article.Add(item);
+                }
+                //DBへの保存を確定
+                db.SaveChanges();
+                Console.WriteLine("終了");
+                Console.Read();
 
             }
 
@@ -49,21 +126,33 @@
 
         }
 
+        
+    //エンティティクラス
+    public class Article
+    {
+        public int Id { get; set; }
+        public string LinkUrl { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string ChannelTitle { get; set; }
+    }
 
-        public class Program
+    //コンテキストクラス
+    public class AppDbContext : DbContext
+    {
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            public static IConfigurationRoot configuration;
-            public static void Main(string[] args)
-            {
-
-                configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile(@"appsettings.json", false).Build();
-                BuildWebHost(args).Run();
-            }
-            public static IWebHost BuildWebHost(string[] args) =>
-                WebHost.CreateDefaultBuilder(args)
-                    .UseStartup<Startup>()
-                    .Build();
+            base.OnConfiguring(optionsBuilder);
+            //ここでは接続先のDB名はhellocoredbとする
+            optionsBuilder.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=hellocoredb;");
         }
+        public DbSet<Article> Article { get; set; }
+    }
+
+
+
+
+
 
 
 

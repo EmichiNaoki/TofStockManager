@@ -1,7 +1,5 @@
 ﻿namespace Tofree.StockManager.Models
 {
-
-
     /// <summary>
     /// 性別を表します。
     /// </summary>    
