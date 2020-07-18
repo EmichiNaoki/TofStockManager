@@ -157,11 +157,19 @@ namespace Tofree.StockManager.Models
 
     public class Program
     {
+<<<<<<< HEAD
         public Program(string[] args)
         {
             //登録すれば必要な場面(Win上で実行した時)で使用される。
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
         }
+=======
+        //public static void Main(string[] args)
+        //{
+        //    //登録すれば必要な場面(Win上で実行した時)で使用される。
+        //    System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+        //}
+>>>>>>> f8baece45dfc7381a9dc09897c53dd6a62eec1fa
     }
     //エンティティクラス
     public class Article

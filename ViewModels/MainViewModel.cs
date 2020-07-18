@@ -113,52 +113,52 @@
             
 
 
-            var db = new AppDbContext();
-            var http = new System.Net.Http.HttpClient();
+            //var db = new AppDbContext();
+            //var http = new System.Net.Http.HttpClient();
 
-            //フィードを適当なサイトから取得
-            foreach (var targetUrl in
-                new[] {
-                    "http://www3.asahi.com/rss/index.rdf",
-                    "http://rss.rssad.jp/rss/codezine/new/20/index.xml",
-                })
+            ////フィードを適当なサイトから取得
+            //foreach (var targetUrl in
+            //    new[] {
+            //        "http://www3.asahi.com/rss/index.rdf",
+            //        "http://rss.rssad.jp/rss/codezine/new/20/index.xml",
+            //    })
 
-            {
-                //フィードxmlをDL & Parse
-                //xmlは名前空間で面倒が生じないよう名前空間情報を除染
-                var rssTxt = http.GetStringAsync(targetUrl).Result;
-                var rss = System.Xml.Linq.XElement.Parse(rssTxt);
-                foreach (var item in rss.Descendants())
-                    item.Name = item.Name.LocalName;
+            //{
+            //    //フィードxmlをDL & Parse
+            //    //xmlは名前空間で面倒が生じないよう名前空間情報を除染
+            //    var rssTxt = http.GetStringAsync(targetUrl).Result;
+            //    var rss = System.Xml.Linq.XElement.Parse(rssTxt);
+            //    foreach (var item in rss.Descendants())
+            //        item.Name = item.Name.LocalName;
 
 
-                //フィードの記事をModelオブジェクトへ移し替える
-                var articles = rss
-                    .Descendants("item")
-                    .Select(item =>
-                        new Article()
-                        {
-                            Title = item.Element("title").Value,
-                            LinkUrl = item.Element("link").Value,
-                            Description = item.Element("description").Value,
-                            ChannelTitle = rss.Element("channel").Element("title").Value,
-                        });
+            //    //フィードの記事をModelオブジェクトへ移し替える
+            //    var articles = rss
+            //        .Descendants("item")
+            //        .Select(item =>
+            //            new Article()
+            //            {
+            //                Title = item.Element("title").Value,
+            //                LinkUrl = item.Element("link").Value,
+            //                Description = item.Element("description").Value,
+            //                ChannelTitle = rss.Element("channel").Element("title").Value,
+            //            });
 
-                //DBに未追加の記事をDBへ保存する
-                foreach (var item in articles)
-                {
-                    if (db.Article.Any(_ => _.LinkUrl == item.LinkUrl))
-                        continue;
+            //    //DBに未追加の記事をDBへ保存する
+            //    foreach (var item in articles)
+            //    {
+            //        if (db.Article.Any(_ => _.LinkUrl == item.LinkUrl))
+            //            continue;
 
-                    Console.WriteLine(item.Title);
-                    db.Article.Add(item);
-                }
-                //DBへの保存を確定
-                db.SaveChanges();
-                Console.WriteLine("終了");
-                Console.Read();
+            //        Console.WriteLine(item.Title);
+            //        db.Article.Add(item);
+            //    }
+            //    //DBへの保存を確定
+            //    db.SaveChanges();
+            //    Console.WriteLine("終了");
+            //    Console.Read();
 
-            }
+            //}
 
 
 
