@@ -21,5 +21,6 @@ namespace Tofree.StockManager.Views
         {
             InitializeComponent();
         }
+
     }
 }

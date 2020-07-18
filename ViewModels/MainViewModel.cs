@@ -18,6 +18,15 @@
 
     using Microsoft.EntityFrameworkCore;
 
+
+    using Microsoft.Win32;
+
+    using System.Collections;
+
+    using static System.Console;
+    using System.Windows.Input;
+    using System.Windows;
+
     ///<summary
     ///MainViewウインドウに対するデータコンテキストを表します
     ///</summary>
@@ -28,50 +37,80 @@
         {
 
 
-            DBManager dBManager = new DBManager();
+
+
+
+
+
+
+
+
+
+            //自宅PCかどうか確認して
+            string machineName = Environment.MachineName;
+            if (machineName == "NAOTAB")
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    var product = new Product()
+                    {
+                        ProductNo = "sam-ple-" + i,
+                        ProductName = "これはサンプルです" + i,
+                        StockQTY = i * 10,
+                        ModDate = DateTime.Today.ToString("yyyy/MM/dd"),
+                        ModTime = DateTime.Now.ToString("HH:mm:ss")
+                    };
+
+                    ProductsList.Add(product);
+                }
+                return;
+                
+            }
+
+                
+            DBManager dBManager = new DBManager();               
             var sqlstr = @"select * from TEST.T_STOCK;";
             try
             {
                 SqlDataReader dr = dBManager.ExecuteQuery(sqlstr);
-
                 if (dr.HasRows)
                 {
                     while (dr.Read())
                     {
                         var product = new Product()
                         {
-                            ProductNo = dr["CODE"].ToString(),
-                            ProductName = dr["Name"].ToString(),
-                            StockQTY = (int)dr["QTY"],
-                            ModDate = DateTime.Today.ToString("yyyy/MM/dd"),
-                            ModTime = DateTime.Now.ToString("HH:mm:ss"),
-                        };
+                                ProductNo = dr["CODE"].ToString(),
+                                ProductName = dr["Name"].ToString(),
+                                StockQTY = (int)dr["QTY"],
+                                ModDate = DateTime.Today.ToString("yyyy/MM/dd"),
+                                ModTime = DateTime.Now.ToString("HH:mm:ss"),
+                            };
 
-                        ProductsList.Add(product);
-
+                            ProductsList.Add(product);
+                        }
                     }
+
+
+                    dr.Close();
+
+
+                }
+                catch (Exception exc)
+                {
+                    Debug.WriteLine(exc.Message);
+                }
+                finally
+                {
+
+                    dBManager.Close();
                 }
 
 
-                dr.Close();
-                
-                
+            
 
 
 
-            }
-            catch(Exception exc)
-            {
-                Debug.WriteLine(exc.Message);
-            }
-            finally
-            {
-
-                dBManager.Close();
-            }
-
-
-
+            
 
 
             var db = new AppDbContext();
@@ -125,11 +164,90 @@
 
 
         }
+        private DelegateCommand _listViewItem_MouseDoubleClick;
 
+        ///<summary>
+        ///LISTVIEWをダブルクリックしたときの動作
+        /// </summary>
+        private DelegateCommand ListViewItem_MouseDoubleClick
+        {
+            get
+            {
+                return this._listViewItem_MouseDoubleClick ?? (this._listViewItem_MouseDoubleClick = new DelegateCommand(
+                    _ =>
+                    {
+                        System.Diagnostics.Debug.WriteLine("daburukurikku ");
+                    }));
+            }
+                
         
-    //エンティティクラス
-    public class Article
-    {
+            // sender がダブルクリックされた項目
+            //var targetItem = sender;
+
+            // データバインディングを使っているなら、
+            // DataContext からデータを取得できる
+            //Person p = (Person)targetItem.DataContext;
+        }
+
+
+
+
+        private DelegateCommand _lastastNameCM_Click;
+        public DelegateCommand LastNameCM_Click
+        {
+            get
+            {
+                return this._lastastNameCM_Click ?? (this._lastastNameCM_Click = new DelegateCommand(
+                    _ =>
+                    {
+                        System.Diagnostics.Debug.WriteLine("LastNameCM_Click");
+                    }));
+
+            }
+        
+            
+
+           
+        }
+
+
+
+
+        private DelegateCommand _addProductsListCommand;
+        ///<summary>
+        ///追加コマンドを取得します。
+        /// </summary>
+        public DelegateCommand AddProductsListCommand
+        {
+            get
+            {
+                return this._addProductsListCommand ?? (this._addProductsListCommand = new DelegateCommand(
+                    _ =>
+                    {
+                        this._count++;
+                        var product = new Product()
+                        {
+                            ProductNo = "sam-ple-" + this._count,
+                            ProductName = "これはサンプルです" + this._count,
+                            StockQTY = _count * 10,
+                            ModDate = DateTime.Today.ToString("yyyy/MM/dd"),
+                            ModTime = DateTime.Now.ToString("HH:mm:ss")
+                        };
+                        this.ProductsList.Add(product);
+
+                        System.Diagnostics.Debug.WriteLine(product.ProductName + "を追加しました。");
+                    }));
+            }
+        }
+
+
+
+
+        #region LINQ for Entities
+
+        //エンティティクラス
+        public class Article
+        {
         public int Id { get; set; }
         public string LinkUrl { get; set; }
         public string Title { get; set; }
@@ -154,7 +272,7 @@
 
 
 
-
+        #endregion LINQ for Entities
 
 
 
@@ -171,33 +289,6 @@
         }
 
         
-        private DelegateCommand _addProductsListCommand;
-        ///<summary>
-        ///追加コマンドを取得します。
-        /// </summary>
-        public DelegateCommand AddProductsListCommand
-        {
-            get
-            {
-                return this._addProductsListCommand ?? (this._addProductsListCommand = new DelegateCommand(
-                    _ =>
-                    {
-                        this._count++;
-                        var product = new Product()
-                        {
-                            ProductNo = "sam-ple-" + this._count,
-                            ProductName = "これはサンプルです" + this._count,
-                            StockQTY = _count * 10,
-                            ModDate = DateTime.Today.ToString("yyyy/MM/dd"),
-                            ModTime = DateTime.Now.ToString("HH:mm:ss")
-                        };
-                        this.ProductsList.Add(product);
-                        
-                        System.Diagnostics.Debug.WriteLine(product.ProductName + "を追加しました。");
-                    }));
-            }
-        }
-
 
 
 
@@ -412,9 +503,6 @@
         }
 
         #endregion バージョン情報を取得する
-
-
-
 
 
 
